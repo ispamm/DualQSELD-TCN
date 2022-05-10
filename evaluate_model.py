@@ -296,23 +296,34 @@ def main(args):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    #i/o parameters
-    parser.add_argument('--model_path', type=str, default='RESULTS/Task2/checkpoint')
-    parser.add_argument('--results_path', type=str, default='RESULTS/Task2/metrics')
+    #saving/loading parameters
+    parser.add_argument('--results_path', type=str, default='RESULTS/Task2',
+                        help='Folder to write results dicts into')
+    parser.add_argument('--checkpoint_dir', type=str, default='RESULTS/Task2',
+                        help='Folder to write checkpoints into')
+    parser.add_argument('--load_model', type=str, default=None,#'RESULTS/Task2/checkpoint',
+                        help='Reload a previously trained model (whole task model)')
     #dataset parameters
-    parser.add_argument('--predictors_path', type=str, default='/var/datasets/L3DAS21/processed/task2_predictors_test.pkl')
-    parser.add_argument('--target_path', type=str, default='/var/datasets/L3DAS21/processed/task2_target_test.pkl')
-    parser.add_argument('--sr', type=int, default=32000)
-    #eval parameters
-    parser.add_argument('--use_cuda', type=str, default='True')
+    parser.add_argument('--training_predictors_path', type=str,default='/var/datasets/L3DAS21/processed/task2_predictors_train.pkl')
+    parser.add_argument('--training_target_path', type=str,default='/var/datasets/L3DAS21/processed/task2_target_train.pkl')
+    parser.add_argument('--validation_predictors_path', type=str, default='/var/datasets/L3DAS21/processed/task2_predictors_validation.pkl')
+    parser.add_argument('--validation_target_path', type=str, default='/var/datasets/L3DAS21/processed/task2_target_validation.pkl')
+    parser.add_argument('--test_predictors_path', type=str, default='/var/datasets/L3DAS21/processed/task2_predictors_test.pkl')
+    parser.add_argument('--test_target_path', type=str, default='/var/datasets/L3DAS21/processed/task2_target_test.pkl')
+    #training parameters
     parser.add_argument('--gpu_id', type=int, default=0)
-    
-    parser.add_argument('--max_loc_value', type=float, default=2.,
-                         help='max value of target loc labels (to rescale model\'s output since the models has tanh in the output loc layer)')
-    parser.add_argument('--num_frames', type=int, default=600,
-                        help='total number of time frames in the predicted seld matrices. (600 for 1-minute sounds with 100msecs frames)')
-    parser.add_argument('--spatial_threshold', type=float, default=2.,
-                        help='max cartesian distance withn consider a true positive')
+    parser.add_argument('--use_cuda', type=str, default='True')
+    parser.add_argument('--early_stopping', type=str, default='True')
+    parser.add_argument('--fixed_seed', type=str, default='True')
+
+    parser.add_argument('--lr', type=float, default=0.0001)
+    parser.add_argument('--batch_size', type=int, default=1,
+                        help="Batch size")
+    parser.add_argument('--sr', type=int, default=32000,
+                        help="Sampling rate")
+    parser.add_argument('--patience', type=int, default=250,
+                        help="Patience for early stopping on validation set")
+
     #model parameters
     #the following parameters produce a prediction for each 100-msecs frame
     parser.add_argument('--architecture', type=str, default='DualQSELD-TCN',
@@ -338,6 +349,11 @@ if __name__ == '__main__':
     parser.add_argument('--batch_norm', type=str, default='BN')
     parser.add_argument('--dilation_mode', type=str, default='fibonacci')
     parser.add_argument('--model_extra_name', type=str, default='')
+    parser.add_argument('--test_mode', type=str, default='test_best')
+    parser.add_argument('--use_lr_scheduler', type=str, default='True')
+    parser.add_argument('--lr_scheduler_step_size', type=int, default=150)
+    parser.add_argument('--lr_scheduler_gamma', type=float, default=0.5)
+    parser.add_argument('--min_lr', type=float, default=0.000005) 
     parser.add_argument('--dataset_normalization', type=str, default='True') 
     parser.add_argument('--kernel_size_cnn_blocks', type=int, default=3) 
     parser.add_argument('--kernel_size_dilated_conv', type=int, default=3) 
@@ -356,22 +372,49 @@ if __name__ == '__main__':
     parser.add_argument('--use_time_distributed', type=str, default='False') 
     parser.add_argument('--parallel_ConvTC_block', type=str, default='False') 
 
+    '''parser.add_argument('--wandb_id', type=str, default='none')
+    parser.add_argument('--wandb_project', type=str, default='')
+    parser.add_argument('--wandb_entity', type=str, default='')'''
+    ############## TEST  ###################
+    parser.add_argument('--max_loc_value', type=float, default=2.,
+                         help='max value of target loc labels (to rescale model\'s output since the models has tanh in the output loc layer)')
+    parser.add_argument('--num_frames', type=int, default=600,
+                        help='total number of time frames in the predicted seld matrices. (600 for 1-minute sounds with 100msecs frames)')
+    parser.add_argument('--spatial_threshold', type=float, default=2.,
+                        help='max cartesian distance withn consider a true positive')
+    ########################################
 
-    args = parser.parse_args()
-    #eval string args
+    ######################### CHECKPOINT ####################################################
+    parser.add_argument('--checkpoint_step', type=int, default=100,
+                        help="Save and test models every checkpoint_step epochs")
+    parser.add_argument('--test_step', type=int, default=10,
+                        help="Save and test models every checkpoint_step epochs")
+    parser.add_argument('--min_n_epochs', type=int, default=1000,
+                        help="Save and test models every checkpoint_step epochs")
+    parser.add_argument('--Dcase21_metrics_DOA_threshold', type=int, default=20) 
+    parser.add_argument('--parallel_magphase', type=str, default='False') 
+
+    parser.add_argument('--TextArgs', type=str, default='config/Test.txt', help='Path to text with training settings')#'config/PHC-SELD-TCN-S1_BN.txt'
+    parse_list = readFile(parser.parse_args().TextArgs)
+    args = parser.parse_args(parse_list)
+    
+    #eval string bools and lists
     args.use_cuda = eval(args.use_cuda)
-    args.verbose = eval(args.verbose)
-
+    args.early_stopping = eval(args.early_stopping)
     args.fixed_seed = eval(args.fixed_seed)
     args.pool_size= eval(args.pool_size)
     args.cnn_filters = eval(args.cnn_filters)
     args.verbose = eval(args.verbose)
     args.D=eval(args.D)
     args.V=eval(args.V)
+    args.use_lr_scheduler=eval(args.use_lr_scheduler)
+    #args.dataset_normalization=eval(args.dataset_normalization)
     args.phase=eval(args.phase)
     args.use_tcn=eval(args.use_tcn)
     args.use_bias_conv=eval(args.use_bias_conv)
     args.use_bias_linear=eval(args.use_bias_linear)
     args.fc_layers = eval(args.fc_layers)
     args.parallel_magphase = eval(args.parallel_magphase)
+
     main(args)
+
