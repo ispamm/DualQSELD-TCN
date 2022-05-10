@@ -319,13 +319,13 @@ class SELD_Model(nn.Module):
 
         if parallel_ConvTC_block in {'2Parallel','2BParallel','2ParallelBranches','2PB'}:
             self.branch_A=ConvTC_Block(time_dim=time_dim, freq_dim=freq_dim, input_channels=input_channels//2, 
-                    domain=domain, n=n, integer_init=integer_init,ghost_module=ghost_module,ghost_ratio=ghost_ratio,
+                    domain=domain,
                     cnn_filters=cnn_filters, kernel_size_cnn_blocks=kernel_size_cnn_blocks, pool_size=pool_size, pool_time=pool_time,
                     D=D, dilation_mode=dilation_mode,G=G, U=U, kernel_size_dilated_conv=kernel_size_dilated_conv,spatial_dropout_rate=spatial_dropout_rate,
                     V=V, V_kernel_size=V_kernel_size,
                     dropout_perc=dropout_perc,use_bias_conv=use_bias_conv,batch_norm=batch_norm,verbose=False)
             self.branch_B=ConvTC_Block(time_dim=time_dim, freq_dim=freq_dim, input_channels=input_channels//2, 
-                    domain=domain, n=n, integer_init=integer_init,ghost_module=ghost_module,ghost_ratio=ghost_ratio,
+                    domain=domain,
                     cnn_filters=cnn_filters, kernel_size_cnn_blocks=kernel_size_cnn_blocks, pool_size=pool_size, pool_time=pool_time,
                     D=D, dilation_mode=dilation_mode,G=G, U=U, kernel_size_dilated_conv=kernel_size_dilated_conv,spatial_dropout_rate=spatial_dropout_rate,
                     V=V, V_kernel_size=V_kernel_size,
@@ -333,7 +333,7 @@ class SELD_Model(nn.Module):
             fc_input_size=V[-1]*2
         else:
             self.seld_block=ConvTC_Block(time_dim=time_dim, freq_dim=freq_dim, input_channels=input_channels, 
-                    domain=domain, n=n, integer_init=integer_init,ghost_module=ghost_module,ghost_ratio=ghost_ratio,
+                    domain=domain, 
                     cnn_filters=cnn_filters, kernel_size_cnn_blocks=kernel_size_cnn_blocks, pool_size=pool_size, pool_time=pool_time,
                     D=D, dilation_mode=dilation_mode,G=G, U=U, kernel_size_dilated_conv=kernel_size_dilated_conv,spatial_dropout_rate=spatial_dropout_rate,
                     V=V, V_kernel_size=V_kernel_size,
@@ -450,7 +450,7 @@ def test_model():
     #create 1 prediction (sed and doa) for each 100-milliseconds label frame
 
     model= SELD_Model(time_dim=sp.shape[-1],  freq_dim=256, input_channels=4, output_classes=14,
-                 domain='DQ',domain_classifier='same', n=4, integer_init=True,ghost_module='None',ghost_ratio=2,
+                 domain='DQ',domain_classifier='same',
                  cnn_filters=[64,64,64], kernel_size_cnn_blocks=3, pool_size=[[8,2],[8,2],[2,2]], pool_time='TCN',
                  D=[10], dilation_mode='fibonacci',G=128, U=128, kernel_size_dilated_conv=3,spatial_dropout_rate=0.5,V=[128,128], V_kernel_size=3,
                  fc_layers=[128], fc_activations='Linear', fc_dropout='all', dropout_perc=0.3, 
