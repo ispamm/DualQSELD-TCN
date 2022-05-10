@@ -56,7 +56,7 @@ class ResBlock(nn.Module):
         if(not spatial_dropout_rate==0):
             self.dropout = nn.Dropout2d(p=spatial_dropout_rate)
 
-        elif self.domain=='Q':
+        if self.domain=='Q':
             self.conv2_skip = QuaternionConv(G,U, kernel_size=1, stride=1, bias=use_bias_conv, operation='convolution1d')
             self.conv2_residual= QuaternionConv(G,L, kernel_size=1, stride=1, bias=use_bias_conv, operation='convolution1d')
         elif self.domain=='DQ':
