@@ -551,7 +551,7 @@ def main(args):
                 #print(x.shape)
                 #sed, doa = model(x)
                 #print(x.shape)
-                loss = seld_loss(x, target, model, criterion_sed, criterion_doa,epoch)
+                loss = seld_loss(x, target, model, criterion_sed, criterion_doa)
                 loss.backward()
 
                 train_loss += (1. / float(example_num + 1)) * (loss - train_loss)
@@ -563,7 +563,7 @@ def main(args):
                 pbar.update(1)
 
             #PASS VALIDATION DATA
-            val_loss = evaluate(model, device, criterion_sed, criterion_doa, val_data,epoch)
+            val_loss = evaluate(model, device, criterion_sed, criterion_doa, val_data)
             
             if args.use_lr_scheduler and optimizer.param_groups[0]['lr']>args.min_lr:
                 scheduler.step()######################################################################Dynamic learning rate
