@@ -29,7 +29,7 @@ Please cite our work if you found it useful.
 ```
 @article{grassucci2022DualQ,
       title={Dual Quaternion Ambisonics Array for Six-Degree-of-Freedom Acoustic Representation}, 
-      author={Grassucci, Eleonora and Mancini, Giorgia and Brignone, Christian, and Uncini, Aurelio and Comminiello, Danilo},
+      author={Grassucci, Eleonora and Mancini, Gioia and Brignone, Christian, and Uncini, Aurelio and Comminiello, Danilo},
       year={2022},
       journal={arXiv preprint: arXiv:2204.01851}
 }
