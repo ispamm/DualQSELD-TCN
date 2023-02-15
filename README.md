@@ -1,5 +1,7 @@
 # DualQSELD-TCN
-Official PyTorch repository for Dual Quaternion Ambisonics Array for Six-Degree-of-Freedom Acoustic Representation, under review. [ArXiv preprint](https://arxiv.org/pdf/2204.01851.pdf)  
+Official PyTorch repository for Dual Quaternion Ambisonics Array for Six-Degree-of-Freedom Acoustic Representation, published in Elsevier Pattern Recognition Letters. 
+[ArXiv preprint](https://arxiv.org/pdf/2204.01851.pdf)
+[Elsevier Pattern Recognition Letters](https://www.sciencedirect.com/science/article/pii/S0167865522003749)
 
 Eleonora Grassucci, Gioia Mancini, Christian Brignone, Aurelio Uncini, and Danilo Comminiello
 
@@ -27,10 +29,15 @@ For detailed instructions and more information on the dataset, please refer to t
 Please cite our work if you found it useful.
 
 ```
-@article{grassucci2022DualQ,
-      title={Dual Quaternion Ambisonics Array for Six-Degree-of-Freedom Acoustic Representation}, 
-      author={Grassucci, Eleonora and Mancini, Gioia and Brignone, Christian, and Uncini, Aurelio and Comminiello, Danilo},
-      year={2022},
-      journal={arXiv preprint: arXiv:2204.01851}
+@article{GRASSUCCI202324,
+title = {Dual quaternion ambisonics array for six-degree-of-freedom acoustic representation},
+journal = {Pattern Recognition Letters},
+volume = {166},
+pages = {24-30},
+year = {2023},
+issn = {0167-8655},
+doi = {https://doi.org/10.1016/j.patrec.2022.12.006},
+url = {https://www.sciencedirect.com/science/article/pii/S0167865522003749},
+author = {Eleonora Grassucci and Gioia Mancini and Christian Brignone and Aurelio Uncini and Danilo Comminiello}
 }
 ```
