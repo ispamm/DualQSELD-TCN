@@ -653,6 +653,19 @@ def main(args):
                 wandb.log({"LSD score": test_best_results[-7]},step=epoch)    
                 wandb.log({"CSL score": test_best_results[-8]},step=epoch) '''          
                 
+                if test_best_results[10]<=best_test_metric: #if we get a lower (better) GlobalSELD
+                    print("Saving BEST TEST model...")
+                    best_test_metric=test_best_results[10]
+                    
+                    if args.test_mode=='test_best':
+                        if new_best:
+                            state["best_test_epoch"]=state["best_epoch"]
+                        else:
+                            state["best_test_epoch"]=best_epoch_checkpoint
+                    else:
+                        state["best_test_epoch"]=epoch
+                    save_model(model, optimizer, state, checkpoint_path+'_best_model_on_Test',scheduler)
+                    
                 if args.test_mode=='test_best':
                     state = load_model(model, optimizer, args.load_model, args.use_cuda,device,scheduler)
                 if new_best:
@@ -665,7 +678,7 @@ def main(args):
                 print ('\n***************CHECKPOINT EPOCH {}****************'.format(epoch))
                 shutil.copyfile(checkpoint_best_model_path, checkpoint_dir+"checkpoint_best_epoch_{}".format(state["best_epoch"]))            
                 shutil.copyfile(checkpoint_path, checkpoint_dir+"checkpoint_epoch_{}".format(epoch))            
-                shutil.copyfile(checkpoint_path+'_best_model_on_Test', checkpoint_dir+"checkpoint_best_model_on_Test_epoch_{}".format(state["best_epoch"]))            
+                shutil.copyfile(checkpoint_path+'_best_model_on_Test', checkpoint_dir+"checkpoint_best_model_on_Test_epoch_{}".format(state["best_test_epoch"]))            
                 
                 shutil.copyfile(checkpoint_best_model_checkpoint_path, checkpoint_dir+"checkpoint_best_model_checkpoint_epoch_{}".format(best_epoch_checkpoint))
                 
